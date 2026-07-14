@@ -1,0 +1,17 @@
+/* Paletas claro/escuro - trocadas via [data-theme] no <html> */
+:root, [data-theme="light"] {
+  --color-bg: #f7f6f2; --color-surface: #ffffff; --color-surface-2: #fbfbf9; --color-surface-offset: #f3f0ec;
+  --color-border: #e3e0d9; --color-divider: #ebe8e3;
+  --color-text: #1f1d17; --color-text-muted: #66645f; --color-text-faint: #9d9a95; --color-text-inverse: #f9f8f4;
+  --color-primary: #01696f; --color-primary-hover: #0c4e54; --color-primary-soft: rgba(1,105,111,.1);
+  --color-success: #2f7a22; --color-error: #c1293c; --color-warning: #b06a00; --color-blue: #006494;
+  --overlay: rgba(15,15,13,.45);
+}
+[data-theme="dark"] {
+  --color-bg: #141412; --color-surface: #1c1b19; --color-surface-2: #201f1d; --color-surface-offset: #262420;
+  --color-border: #34322e; --color-divider: #2b2a28;
+  --color-text: #f1efe9; --color-text-muted: #b6b2ab; --color-text-faint: #7d7973; --color-text-inverse: #171614;
+  --color-primary: #57b0bb; --color-primary-hover: #74c3cd; --color-primary-soft: rgba(87,176,187,.16);
+  --color-success: #7fce5b; --color-error: #ef7c8c; --color-warning: #e7ab4c; --color-blue: #7dbaea;
+  --overlay: rgba(0,0,0,.6);
+}
