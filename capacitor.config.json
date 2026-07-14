@@ -1,0 +1,27 @@
+{
+  "appId": "br.com.fluxopro.financas",
+  "appName": "Gestão Financeira Pro",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "ios": {
+    "contentInset": "automatic",
+    "scheme": "FluxoPro",
+    "preferredContentMode": "mobile",
+    "backgroundColor": "#f7f6f2",
+    "allowsLinkPreview": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 800,
+      "backgroundColor": "#01696f",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_CROP",
+      "splashFullScreen": true,
+      "splashImmersive": true
+    },
+    "StatusBar": { "style": "DARK", "backgroundColor": "#f7f6f2" },
+    "Haptics": {},
+    "LocalNotifications": { "smallIcon": "ic_stat_notify", "iconColor": "#01696f" },
+    "Keyboard": { "resize": "body", "resizeOnFullScreen": true }
+  }
+}
