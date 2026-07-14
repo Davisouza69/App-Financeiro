@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Gestão Financeira Pro</title>
+  <meta name="description" content="Aplicativo financeiro premium para controle de receitas, despesas, contas, metas e orçamento." />
+  <meta name="theme-color" content="#01696f" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Fluxo Pro" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/themes.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Ir para o conteúdo principal</a>
+
+<div class="app">
+  <aside class="sidebar" aria-label="Navegação principal">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17h4l2-8 4 10 2-6h4"/><path d="M4 6h16"/></svg>
+      </div>
+      <div>
+        <h1>Gestão Financeira Pro</h1>
+        <p>Controle completo e seguro</p>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Seções do app">
+      <button data-section-target="painel" aria-current="true">Painel <span aria-hidden="true">›</span></button>
+      <button data-section-target="lancamentos" aria-current="false">Lançamentos <span aria-hidden="true">›</span></button>
+      <button data-section-target="contas" aria-current="false">Contas e centros <span aria-hidden="true">›</span></button>
+      <button data-section-target="metas" aria-current="false">Metas e orçamento <span aria-hidden="true">›</span></button>
+      <button data-section-target="parcelas" aria-current="false">Parcelamentos <span aria-hidden="true">›</span></button>
+      <button data-section-target="calendario" aria-current="false">Calendário <span aria-hidden="true">›</span></button>
+      <button data-section-target="fechamento" aria-current="false">Fechamento <span aria-hidden="true">›</span></button>
+      <button data-section-target="backup" aria-current="false">Memória e backup <span aria-hidden="true">›</span></button>
+    </nav>
+
+    <div class="sidebar-card highlight">
+      <h3>Memória segura</h3>
+      <p>Seus dados ficam salvos localmente em um banco de dados IndexedDB, com backup exportável em JSON.</p>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>Ações rápidas</h3>
+      <div class="sidebar-actions">
+        <button class="btn btn-primary" id="loadExampleBtn" type="button">Carregar exemplo completo</button>
+        <button class="btn btn-secondary" id="exportBackupBtn" type="button">Exportar backup JSON</button>
+        <button class="btn btn-secondary" id="enableNotificationsBtn" type="button">Ativar notificações</button>
+        <button class="btn btn-danger" id="clearAllBtn" type="button">Apagar memória do app</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content" id="main-content">
+    <header class="top">
+      <div class="headline">
+        <h2>Organize receitas, despesas e decisões</h2>
+        <p>Registre lançamentos, acompanhe metas e orçamento, controle várias contas com transferências, e mantenha tudo salvo com segurança, mesmo offline.</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn btn-secondary" id="themeToggle" type="button">Alternar tema</button>
+        <button class="btn btn-primary" id="quickExpenseBtn" type="button">Nova despesa</button>
+      </div>
+    </header>
+
+    <section id="painel" class="section active" aria-labelledby="painel-heading">
+      <h2 id="painel-heading" class="sr-only">Painel</h2>
+      <div class="card-grid">
+        <article class="card metric"><small>Saldo atual</small><strong id="saldoAtual">R$ 0,00</strong><span id="saldoResumo" class="muted">Receitas menos despesas pagas</span></article>
+        <article class="card metric"><small>Receitas do período</small><strong id="receitasPeriodo">R$ 0,00</strong><span class="good">Entradas confirmadas</span></article>
+        <article class="card metric"><small>Despesas do período</small><strong id="despesasPeriodo">R$ 0,00</strong><span class="bad">Saídas registradas</span></article>
+        <article class="card metric"><small>A vencer em 7 dias</small><strong id="aVencer">R$ 0,00</strong><span class="warn">Contas próximas do vencimento</span></article>
+      </div>
+
+      <div class="content-grid">
+        <article class="card stack">
+          <div class="split"><h3>Visão do mês</h3><span class="muted" id="mesReferencia"></span></div>
+          <div class="toolbar">
+            <label>Mês <input type="month" id="filterMonth" /></label>
+            <label>Tipo
+              <select id="filterType"><option value="todos">Todos</option><option value="receita">Receitas</option><option value="despesa">Despesas</option></select>
+            </label>
+            <label>Status
+              <select id="filterStatus"><option value="todos">Todos</option><option value="pago">Pago</option><option value="pendente">Pendente</option></select>
+            </label>
+            <label>Buscar <input type="search" id="filterQuery" placeholder="Título, categoria..." /></label>
+          </div>
+          <canvas id="categoryChart" role="img" aria-label="Gráfico de despesas por categoria"></canvas>
+        </article>
+
+        <article class="card stack">
+          <h3>Evolução mensal</h3>
+          <canvas id="trendChart" role="img" aria-label="Gráfico de evolução de receitas e despesas"></canvas>
+        </article>
+      </div>
+
+      <div class="content-grid">
+        <article class="card stack">
+          <h3>Contas próximas</h3>
+          <div id="upcomingList" class="list" aria-live="polite"></div>
+        </article>
+        <article class="card stack">
+          <h3>Diagnóstico automático</h3>
+          <div id="diagnostics" class="list" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="lancamentos" class="section" aria-labelledby="lanc-heading">
+      <h2 id="lanc-heading" class="sr-only">Lançamentos</h2>
+      <article class="card">
+        <h3>Novo lançamento</h3>
+        <form id="entryForm" class="form-grid">
+          <label>Título <input required name="title" placeholder="Ex.: Ração, salário, combustível" /></label>
+          <label>Valor <input required name="amount" type="number" step="0.01" min="0" placeholder="0,00" /></label>
+          <label>Tipo
+            <select name="type"><option value="despesa">Despesa</option><option value="receita">Receita</option></select>
+          </label>
+          <label>Status
+            <select name="status"><option value="pago">Pago</option><option value="pendente">Pendente</option></select>
+          </label>
+          <label>Categoria <input name="category" placeholder="Ex.: Alimentação, Moradia, Lazer" /></label>
+          <label>Conta <select name="account" id="entryAccount"></select></label>
+          <label>Centro de custo <select name="costCenter" id="entryCostCenter"></select></label>
+          <label>Vencimento <input name="dueDate" type="date" /></label>
+          <label>Recorrência
+            <select name="recurrence">
+              <option value="none">Não repetir</option>
+              <option value="monthly">Mensal (12x)</option>
+              <option value="quarterly">Trimestral (4x)</option>
+            </select>
+          </label>
+          <label class="full">Comprovante / observação
+            <textarea name="receipt" placeholder="Cole o número, descrição ou caminho do comprovante"></textarea>
+          </label>
+          <div class="action-row full">
+            <button class="btn btn-primary" type="submit" id="entryFormSubmit">Salvar lançamento</button>
+            <button class="btn btn-secondary" type="button" id="entryFormCancel">Cancelar edição</button>
+            <button class="btn btn-secondary" type="button" id="exportCsvBtn">Exportar CSV filtrado</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="card">
+        <div class="split"><h3>Histórico</h3><span class="muted" id="entryCount"></span></div>
+        <div style="overflow:auto;">
+          <table>
+            <thead><tr><th>Data</th><th>Título</th><th>Tipo</th><th>Categoria</th><th>Conta</th><th>Valor</th><th>Status</th><th>Ação</th></tr></thead>
+            <tbody id="entriesTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="contas" class="section" aria-labelledby="contas-heading">
+      <h2 id="contas-heading" class="sr-only">Contas e centros de custo</h2>
+      <div class="two-col">
+        <article class="card">
+          <h3>Contas bancárias / caixa</h3>
+          <form id="accountForm" class="stack">
+            <label>Nome da conta <input name="name" required placeholder="Ex.: Nubank, Caixa, Carteira" /></label>
+            <label>Saldo inicial <input name="balance" type="number" step="0.01" value="0" /></label>
+            <label>Tipo
+              <select name="type"><option value="corrente">Conta corrente</option><option value="poupanca">Poupança</option><option value="dinheiro">Dinheiro</option><option value="investimento">Investimento</option></select>
+            </label>
+            <button class="btn btn-primary" type="submit">Adicionar conta</button>
+          </form>
+          <div id="accountsList" class="list" style="margin-top:1rem"></div>
+        </article>
+        <article class="card">
+          <h3>Centros de custo</h3>
+          <form id="costCenterForm" class="stack">
+            <label>Nome do centro <input name="name" required placeholder="Ex.: Casa, Trabalho, Fazenda, Estudos" /></label>
+            <button class="btn btn-primary" type="submit">Adicionar centro</button>
+          </form>
+          <div id="costCentersList" class="list" style="margin-top:1rem"></div>
+        </article>
+      </div>
+
+      <article class="card">
+        <h3>Transferência entre contas</h3>
+        <form id="transferForm" class="form-grid">
+          <label>De <select name="fromAccount" id="transferFrom"></select></label>
+          <label>Para <select name="toAccount" id="transferTo"></select></label>
+          <label>Valor <input required name="amount" type="number" step="0.01" min="0.01" /></label>
+          <label>Data <input name="date" type="date" /></label>
+          <label class="full">Observação <input name="note" placeholder="Ex.: Reserva de emergência" /></label>
+          <div class="action-row full"><button class="btn btn-primary" type="submit">Transferir</button></div>
+        </form>
+      </article>
+    </section>
+
+    <section id="metas" class="section" aria-labelledby="metas-heading">
+      <h2 id="metas-heading" class="sr-only">Metas e orçamento</h2>
+      <div class="two-col">
+        <article class="card stack">
+          <h3>Metas financeiras</h3>
+          <form id="goalForm" class="stack">
+            <label>Título da meta <input required name="title" placeholder="Ex.: Reserva de emergência" /></label>
+            <label>Valor alvo <input required name="targetAmount" type="number" step="0.01" min="0" /></label>
+            <label>Valor já guardado <input name="currentAmount" type="number" step="0.01" value="0" /></label>
+            <label>Prazo <input name="deadline" type="date" /></label>
+            <button class="btn btn-primary" type="submit">Criar meta</button>
+          </form>
+          <div id="goalsList" class="list"></div>
+        </article>
+
+        <article class="card stack">
+          <h3>Orçamento por categoria</h3>
+          <form id="budgetForm" class="stack">
+            <label>Mês <input required name="month" type="month" /></label>
+            <label>Categoria <input required name="category" placeholder="Ex.: Alimentação" /></label>
+            <label>Limite mensal <input required name="limit" type="number" step="0.01" min="0" /></label>
+            <button class="btn btn-primary" type="submit">Definir orçamento</button>
+          </form>
+          <div id="budgetsList" class="list"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="parcelas" class="section" aria-labelledby="parcelas-heading">
+      <h2 id="parcelas-heading" class="sr-only">Parcelamentos</h2>
+      <article class="card">
+        <h3>Registrar compra parcelada</h3>
+        <form id="installmentForm" class="form-grid">
+          <label>Descrição <input name="title" required placeholder="Ex.: Moto, celular, ferramenta" /></label>
+          <label>Valor total <input name="total" required type="number" step="0.01" min="0" /></label>
+          <label>Número de parcelas <input name="count" required type="number" min="2" max="48" value="2" /></label>
+          <label>Primeiro vencimento <input name="firstDate" required type="date" /></label>
+          <label>Categoria <input name="category" placeholder="Ex.: Equipamentos" /></label>
+          <label>Conta <select name="account" id="installmentAccount"></select></label>
+          <label>Centro de custo <select name="costCenter" id="installmentCostCenter"></select></label>
+          <div class="action-row full"><button class="btn btn-primary" type="submit">Gerar parcelas</button></div>
+        </form>
+      </article>
+      <article class="card">
+        <h3>Resumo de parcelamentos</h3>
+        <div id="installmentSummary" class="list"></div>
+      </article>
+    </section>
+
+    <section id="calendario" class="section" aria-labelledby="calendario-heading">
+      <h2 id="calendario-heading" class="sr-only">Calendário financeiro</h2>
+      <article class="card stack">
+        <h3>Vencimentos do mês</h3>
+        <p class="muted">Use o filtro de mês no Painel para navegar entre períodos.</p>
+        <div id="calendarGrid" class="calendar-grid" aria-label="Calendário de vencimentos"></div>
+      </article>
+    </section>
+
+    <section id="fechamento" class="section" aria-labelledby="fechamento-heading">
+      <h2 id="fechamento-heading" class="sr-only">Fechamento mensal</h2>
+      <div class="two-col">
+        <article class="card stack">
+          <h3>Fechamento mensal</h3>
+          <div id="monthlyClose" class="list"></div>
+        </article>
+        <article class="card stack">
+          <h3>Por centro de custo</h3>
+          <div id="costCenterBreakdown" class="list"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="backup" class="section" aria-labelledby="backup-heading">
+      <h2 id="backup-heading" class="sr-only">Memória e backup</h2>
+      <article class="card stack">
+        <h3>Memória e segurança dos dados</h3>
+        <div class="memory-box" style="display:grid;gap:.5rem;font-size:var(--text-sm)">
+          <div><strong>Armazenamento:</strong> <span id="storageKeyLabel"></span></div>
+          <div><strong>Último salvamento:</strong> <span id="lastSavedLabel"></span></div>
+          <div><strong>Itens salvos:</strong> <span id="savedCounts"></span></div>
+        </div>
+        <div class="action-row">
+          <button class="btn btn-primary" id="downloadBackupBtn" type="button">Baixar backup JSON</button>
+          <label class="btn btn-secondary" style="display:inline-flex;align-items:center;justify-content:center;">Importar backup JSON<input id="importBackupInput" type="file" accept="application/json" hidden></label>
+        </div>
+        <p class="footer-note">Os dados ficam salvos em um banco IndexedDB local no dispositivo. Faça backups periódicos para não perder informações ao trocar de aparelho ou reinstalar o app.</p>
+      </article>
+    </section>
+  </main>
+</div>
+
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>
